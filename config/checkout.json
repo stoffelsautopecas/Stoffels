@@ -1,0 +1,12 @@
+{
+  "provider": "infinitepay",
+  "paymentMethods": [
+    "pix",
+    "credit_card"
+  ],
+  "enabled": false,
+  "handle": "stoffels",
+  "documentationUrl": "https://www.infinitepay.io/checkout-documentacao",
+  "createLinkUrl": "https://api.checkout.infinitepay.io/links",
+  "paymentCheckUrl": "https://api.checkout.infinitepay.io/payment_check"
+}
