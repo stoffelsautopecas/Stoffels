@@ -12,3 +12,4 @@ source/*.log
 .vercel/
 
 __pycache__/
+.vercel
