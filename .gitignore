@@ -13,3 +13,5 @@ source/*.log
 
 __pycache__/
 .vercel
+
+.deploy/

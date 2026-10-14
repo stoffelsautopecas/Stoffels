@@ -19,8 +19,8 @@ Não solicitar dados do cartão na Stoffels. Não considerar parâmetros da URL 
 ## Informações pendentes
 
 - InfiniteTag da conta recebedora: `stoffels` (informada pelo proprietário; validação operacional pendente).
-- Projeto Supabase para persistência dos pedidos e catálogo de venda.
-- URL pública da loja para retorno e notificações.
+- Projeto Supabase configurado com tabelas de catálogo e pedidos; geração de pedidos e conciliação de pagamentos ainda não implementadas.
+- URL pública da loja: https://stoffels.vercel.app; endpoints de retorno e notificações ainda serão implementados.
 - Método de entrega, cálculo de frete e eventual retirada na loja.
 
 Não foram gerados links de pagamento reais nem realizadas cobranças nesta etapa. O carrinho atual continua local e sem finalização de pedidos.

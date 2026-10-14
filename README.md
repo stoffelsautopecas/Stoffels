@@ -89,3 +89,19 @@ Repositório público: https://github.com/stoffelsautopecas/Stoffels
 As fotos WebP de produtos ficam no repositório público. Para respeitar os limites de upload da Vercel, `.vercelignore` as exclui do pacote enviado, e `STOFFELS_IMAGE_BASE_URL` aponta para a pasta pública do GitHub. O build usa essa base nas galerias. Logos, banners e arte da Stoffels continuam no site. Nenhuma senha é necessária para servir essas imagens.
 
 Variáveis do servidor: `DATABASE_URL`, `INFINITEPAY_HANDLE=stoffels`, `CHECKOUT_ENABLED=false` e `STOFFELS_IMAGE_BASE_URL`. Não publicar `DIRECT_URL` no frontend; ela serve apenas às migrações. Ao trocar a senha, atualizar `.env.local` e `DATABASE_URL` na hospedagem e fazer novo deploy. O checkout ainda aguarda regras de entrega e implementação de geração e confirmação de pagamentos.
+
+### Site publicado
+
+Produção: https://stoffels.vercel.app
+
+Banco importado e verificado: 7.963 produtos, 35.612 referências de fotos e 201 categorias; seis tabelas no schema `stoffels`. O banco ocupava aproximadamente 33 MB após a importação.
+
+A publicação inicial foi feita via CLI. A conexão automática GitHub → Vercel não foi concluída; por enquanto, depois de atualizar o código, publique usando um pacote limpo:
+
+```bash
+node scripts/prepare-deploy.mjs
+cd .deploy
+npx vercel deploy --prod --yes --archive=tgz
+```
+
+O pacote `.deploy/` é ignorado pelo Git, contém o código e o catálogo necessários ao site e exclui `.env.local`, caches, Git e as fotos de produtos. As variáveis protegidas já foram cadastradas na Vercel. A publicação foi conferida por HTTP, incluindo as consultas reais do ORM ao Supabase; não houve inspeção visual por navegador conectado nesta sessão.
