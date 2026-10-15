@@ -88,7 +88,7 @@ Repositório público: https://github.com/stoffelsautopecas/Stoffels
 
 As fotos WebP de produtos ficam no repositório público. Para respeitar os limites de upload da Vercel, `.vercelignore` as exclui do pacote enviado, e `STOFFELS_IMAGE_BASE_URL` aponta para a pasta pública do GitHub. O build usa essa base nas galerias. Logos, banners e arte da Stoffels continuam no site. Nenhuma senha é necessária para servir essas imagens.
 
-Variáveis do servidor: `DATABASE_URL`, `INFINITEPAY_HANDLE=stoffels`, `CHECKOUT_ENABLED=false` e `STOFFELS_IMAGE_BASE_URL`. Não publicar `DIRECT_URL` no frontend; ela serve apenas às migrações. Ao trocar a senha, atualizar `.env.local` e `DATABASE_URL` na hospedagem e fazer novo deploy. O checkout ainda aguarda regras de entrega e implementação de geração e confirmação de pagamentos.
+Variáveis do servidor: `DATABASE_URL`, `INFINITEPAY_HANDLE=stoffels`, `CHECKOUT_ENABLED=false` e `STOFFELS_IMAGE_BASE_URL`. Não publicar `DIRECT_URL` no frontend; ela serve apenas às migrações. Ao trocar a senha, atualizar `.env.local` e `DATABASE_URL` na hospedagem e fazer novo deploy. Frete grátis para todo o Brasil em todos os produtos, sem pedido mínimo (`config/checkout.json`). O checkout ainda aguarda implementação de geração e confirmação de pagamentos e confirmação dos estoques.
 
 ### Site publicado
 

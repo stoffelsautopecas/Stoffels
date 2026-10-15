@@ -20,3 +20,5 @@ dialog{position:fixed;border:0;inset:auto 0 0;margin:0;width:100%;max-width:100%
 
 /* Desktop: largura total e altura compacta; a arte inteira permanece visível. */
 @media(min-width:960px){.home-banner>a{display:block;width:100%;max-width:none;margin:0}.home-banner img{width:100%;height:clamp(280px,21vw,400px);max-height:none;aspect-ratio:auto;object-fit:fill}}
+
+.free-shipping{color:var(--red);font-weight:700}.product-price small.free-shipping{color:var(--red);margin-top:5px}

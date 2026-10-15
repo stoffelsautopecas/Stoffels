@@ -8,5 +8,12 @@
   "handle": "stoffels",
   "documentationUrl": "https://www.infinitepay.io/checkout-documentacao",
   "createLinkUrl": "https://api.checkout.infinitepay.io/links",
-  "paymentCheckUrl": "https://api.checkout.infinitepay.io/payment_check"
+  "paymentCheckUrl": "https://api.checkout.infinitepay.io/payment_check",
+  "shipping": {
+    "method": "free",
+    "priceCents": 0,
+    "minimumOrderCents": 0,
+    "destination": "BR",
+    "label": "Frete grátis"
+  }
 }
