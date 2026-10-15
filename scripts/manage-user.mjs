@@ -1,5 +1,4 @@
 // Operação restrita ao proprietário do servidor. Nunca recebe senha em argumentos.
-import { createInterface } from 'node:readline/promises';
 import { normalizeEmail,hashPassword,authPool } from '../lib/auth.js';
 import { closeDatabase } from '../lib/db/index.js';
 const action=process.argv[2],email=normalizeEmail(process.argv[3]);

@@ -11,6 +11,8 @@ dom.window.fetch=async(url,options)=>{
   if(options?.body){requestBody=JSON.parse(options.body);if(requestBody.action==='register')user={name:'Cliente <teste>',email:requestBody.email,role:'customer'};if(requestBody.action==='logout')user=null;}
   return {ok:true,json:async()=>({user})};
  }
+ if(url==='/api/customer')return {ok:true,json:async()=>({user:{...user,phone:''},addresses:[]})};
+ if(url==='/api/orders')return {ok:true,json:async()=>({orders:[]})};
  if(String(url).includes('catalog.json'))return {ok:true,json:async()=>[]};
  if(String(url).includes('categories.json'))return {ok:true,json:async()=>[]};
  throw new Error('URL inesperada: '+url);

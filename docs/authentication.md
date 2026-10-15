@@ -26,7 +26,9 @@ Para recuperar o acesso de uma conta, após verificar a identidade do titular:
 node --env-file=.env.local scripts/manage-user.mjs password email-do-cliente
 ```
 
-Não há envio de e-mail, verificação de endereço de e-mail ou recuperação automática nesta etapa. O cliente pode trocar a senha enquanto conectado. A tela administrativa mostra contagens reais; edição de peças, gestão de pedidos e endereços ainda não estão implementados. O checkout continua em configuração.
+O cliente pode trocar a senha enquanto conectado. O administrador pode gerar um link de recuperação por cliente no painel (uso único, 1 hora), após verificar a identidade. O script `scripts/create-access-link.mjs email` gera um link privado de 24 horas para operação pelo proprietário. Os tokens ficam armazenados apenas como hash e são removidos depois do uso. Não há envio automático de e-mail nem verificação de propriedade de endereço de e-mail.
+
+O painel permite gerir peças/fotos/estoque/embalagens, categorias, clientes, pedidos, rastreio, atendimento e dados da loja. A área do cliente inclui endereços e histórico de pedidos vinculados ao UUID da conta. Veja `docs/checkout-infinitepay.md` para os pagamentos.
 
 ## Verificação
 

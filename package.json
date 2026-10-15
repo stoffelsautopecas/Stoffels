@@ -13,7 +13,8 @@
     "db:seed": "node --env-file=.env.local scripts/db-seed.mjs",
     "test:auth": "node --env-file=.env.local scripts/test-auth.mjs && node scripts/test-auth-ui.mjs",
     "shipping:estimate": "node --env-file=.env.local scripts/estimate-shipping.mjs",
-    "test:shipping": "node scripts/test-shipping.mjs && node scripts/test-shipping-ui.mjs"
+    "test:shipping": "node scripts/test-shipping.mjs && node scripts/test-shipping-ui.mjs",
+    "test:commerce": "node --env-file=.env.local scripts/test-commerce.mjs && node --env-file=.env.local scripts/test-commerce-api.mjs && node scripts/test-commerce-ui.mjs"
   },
   "engines": {
     "node": "22.x"
@@ -23,7 +24,8 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "sharp": "^0.35.5"
   },
   "type": "module"
 }

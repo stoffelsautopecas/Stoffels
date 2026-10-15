@@ -8,7 +8,18 @@ export default async function handler(req,res){
   verifyOrigin(req);const body=await readJson(req);
   if(!body||typeof body!=='object'||Array.isArray(body))throw new AuthError('Dados inválidos.');
   const {action}=body;
-  if(!['register','login','logout','password'].includes(action))throw new AuthError('Ação inválida.');
+  if(!['register','login','logout','password','reset'].includes(action))throw new AuthError('Ação inválida.');
+  if(action==='reset'){
+   await rateLimit(req,'reset');
+   if(!/^[a-f0-9]{64}$/.test(body.token||''))throw new AuthError('Link inválido ou expirado.');
+   const hash=await hashPassword(body.password),client=await authPool().connect();
+   try{await client.query('begin');
+    const {rows}=await client.query('select * from stoffels.account_tokens where token_hash=$1 and expires_at>now() for update',[digest(body.token)]);
+    if(!rows[0])throw new AuthError('Link inválido ou expirado.');
+    const user=(await client.query('update stoffels.users set password_hash=$1 where id=$2 returning id,name,email,role',[hash,rows[0].user_id])).rows[0];
+    await client.query('delete from stoffels.sessions where user_id=$1',[user.id]);await client.query('delete from stoffels.account_tokens where user_id=$1',[user.id]);await createSession(req,res,user,client);await client.query('commit');json(res,200,{user});return;
+   }catch(e){await client.query('rollback');throw e;}finally{client.release();}
+  }
   if(action==='logout'){
    const token=sessionToken(req);if(token)await authPool().query('delete from stoffels.sessions where token_hash=$1',[digest(token)]);
    res.setHeader('Set-Cookie',sessionCookie(req,'',0));json(res,200,{user:null});return;

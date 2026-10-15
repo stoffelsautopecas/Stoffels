@@ -35,7 +35,7 @@ Para atualizar estimativas:
 npm run shipping:estimate -- --apply
 ```
 
-O relatório completo fica em `reports/shipping-estimates.json` (ignorado pelo Git). Dados corrigidos e marcados com `estimated=false` são preservados. Não há editor de embalagens no painel nesta etapa.
+O relatório completo fica em `reports/shipping-estimates.json` (ignorado pelo Git). Dados corrigidos e marcados com `estimated=false` são preservados. O editor de peças no painel permite conferir e corrigir peso, dimensões e a marcação de estimativa/restrição.
 
 ## Carrinho e checkout
 
@@ -43,6 +43,6 @@ O cliente informa o CEP e escolhe uma opção. Os valores retornados em `custom_
 
 As cotações ficam no banco por 15 minutos, vinculadas ao CEP e ao conteúdo do carrinho, preços e medidas. O total da tela soma produtos + frete escolhido. Trocar produtos/quantidades ou vencer a cotação invalida a escolha. Não enviar valores do navegador diretamente para cobranças: o checkout precisa usar `selectedShipping` do servidor e voltar a conferir os preços e o estoque.
 
-O checkout da InfinitePay continua sem finalização de pedidos nesta etapa. O frete preparado aqui não ativa cobrança nem compra de etiquetas. Ativar as consultas reais depende do token; sem ele a API retorna uma mensagem de configuração pendente. A compra da etiqueta e a organização do transporte serão feitas manualmente pela loja.
+O checkout usa `selectedShipping` no servidor e inclui o frete no total enviado à InfinitePay. A integração de consulta foi validada com o token real e publicada. Ela não compra etiquetas; a compra e a organização do transporte são feitas manualmente pela loja. Sem token válido, a API retorna uma mensagem de indisponibilidade.
 
 Testes: `npm run test:shipping`. As respostas do Melhor Envio são simuladas nesses testes; nenhuma etiqueta ou cobrança é criada.

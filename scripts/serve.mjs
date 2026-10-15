@@ -11,6 +11,12 @@ import productHandler from '../api/product.js';
 import authHandler from '../api/auth.js';
 import adminHandler from '../api/admin.js';
 import shippingHandler from '../api/shipping.js';
+import customerHandler from '../api/customer.js';
+import checkoutHandler from '../api/checkout.js';
+import ordersHandler from '../api/orders.js';
+import storeHandler from '../api/store.js';
+import imageHandler from '../api/image.js';
+import infinitepay_webhookHandler from '../api/infinitepay-webhook.js';
 const envPath = fileURLToPath(new URL('../.env.local', import.meta.url));
 if (existsSync(envPath)) loadEnvFile(envPath);
 const compress = promisify(gzip);
@@ -19,6 +25,12 @@ const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charse
 const server = http.createServer(async (req, res) => {
   try {
     let name = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    if(name==='/api/customer'){await customerHandler(req,res);return;}
+    if(name==='/api/checkout'){await checkoutHandler(req,res);return;}
+    if(name==='/api/orders'){await ordersHandler(req,res);return;}
+    if(name==='/api/store'){await storeHandler(req,res);return;}
+    if(name==='/api/image'){await imageHandler(req,res);return;}
+    if(name==='/api/infinitepay-webhook'){await infinitepay_webhookHandler(req,res);return;}
     if(name==='/api/shipping'){await shippingHandler(req,res);return;}
     if(name==='/api/auth'){await authHandler(req,res);return;}
     if(name==='/api/admin'){await adminHandler(req,res);return;}

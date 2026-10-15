@@ -1,9 +1,9 @@
-import { AuthError,requireUser,authPool,json } from '../lib/auth.js';
-export default async function handler(req,res){
- try{
-  if(req.method!=='GET'){res.setHeader('Allow','GET');throw new AuthError('Método não permitido.',405);}
-  const user=await requireUser(req,'admin');
-  const {rows}=await authPool().query('select (select count(*)::int from stoffels.products) as products,(select count(*)::int from stoffels.users where role=\'customer\') as customers,(select count(*)::int from stoffels.orders) as orders');
-  json(res,200,{user,summary:rows[0]});
- }catch(error){json(res,error instanceof AuthError?error.status:503,{error:error instanceof AuthError?error.message:'Administração indisponível.'});}
-}
+import { AuthError,requireUser,verifyOrigin,readJson,json } from '../lib/auth.js';
+import { CheckoutError } from '../lib/infinitepay.js';
+import { adminGet,adminPost } from '../lib/admin-store.js';
+export default async function handler(req,res){try{
+ const user=await requireUser(req,'admin');
+ if(req.method==='GET'){json(res,200,{user,...await adminGet(new URL(req.url,'http://localhost').searchParams)});return;}
+ if(req.method==='POST'){verifyOrigin(req);json(res,200,await adminPost(await readJson(req,65536),user));return;}
+ res.setHeader('Allow','GET, POST');throw new AuthError('Método não permitido.',405);
+}catch(error){json(res,error instanceof AuthError||error instanceof CheckoutError?error.status:503,{error:error instanceof AuthError||error instanceof CheckoutError?error.message:'Não foi possível atualizar a administração.'});}}
