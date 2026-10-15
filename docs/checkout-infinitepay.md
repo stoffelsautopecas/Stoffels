@@ -9,7 +9,7 @@ O checkout é hospedado pela InfinitePay. O backend da Stoffels envia os itens p
 ## Fluxo a implementar
 
 1. Receber apenas IDs e quantidades do carrinho e conferir disponibilidade e preços no servidor.
-2. Registrar o pedido e seu total no Supabase antes de criar o link; usar frete grátis em todos os produtos: `shipping_cents=0`, `shipping_method=free` e total igual ao subtotal. Não adicionar cobrança de frete ao link da InfinitePay.
+2. Registrar o pedido e seu total no Supabase antes de criar o link; recuperar a cotação válida com `selectedShipping` (ID da cotação + serviço + CEP + carrinho). Usar o valor salvo no servidor em `shipping_cents`, somar ao subtotal e incluir a linha de frete no link da InfinitePay. Nunca aceitar valor de frete enviado pelo navegador.
 3. Criar o link com `handle`, `items` e um `order_nsu` único associado ao pedido.
 4. Encaminhar o comprador ao checkout hospedado da InfinitePay.
 5. Tratar retorno e webhook como notificações; consultar `POST /payment_check` no servidor e conferir o pedido e os valores antes de marcar como pago. Processar notificações repetidas sem duplicar pedidos.
@@ -21,6 +21,6 @@ Não solicitar dados do cartão na Stoffels. Não considerar parâmetros da URL 
 - InfiniteTag da conta recebedora: `stoffels` (informada pelo proprietário; validação operacional pendente).
 - Projeto Supabase configurado com tabelas de catálogo e pedidos; geração de pedidos e conciliação de pagamentos ainda não implementadas.
 - URL pública da loja: https://stoffels.vercel.app; endpoints de retorno e notificações ainda serão implementados.
-- Entrega definida: frete grátis para todo o Brasil, em todos os produtos, sem pedido mínimo. Não integrar Melhor Envio nesta etapa.
+- Entrega definida: cobrar o frete calculado pelo Melhor Envio. Integração exclusivamente de consulta; não comprar etiquetas ou realizar pagamentos ao Melhor Envio. Exige token no servidor.
 
 Não foram gerados links de pagamento reais nem realizadas cobranças nesta etapa. O carrinho atual continua local e sem finalização de pedidos.

@@ -11,7 +11,9 @@
     "import:catalog": "python3 scripts/import_catalog.py",
     "db:migrate": "node --env-file=.env.local scripts/db-migrate.mjs",
     "db:seed": "node --env-file=.env.local scripts/db-seed.mjs",
-    "test:auth": "node --env-file=.env.local scripts/test-auth.mjs && node scripts/test-auth-ui.mjs"
+    "test:auth": "node --env-file=.env.local scripts/test-auth.mjs && node scripts/test-auth-ui.mjs",
+    "shipping:estimate": "node --env-file=.env.local scripts/estimate-shipping.mjs",
+    "test:shipping": "node scripts/test-shipping.mjs && node scripts/test-shipping-ui.mjs"
   },
   "engines": {
     "node": "22.x"

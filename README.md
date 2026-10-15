@@ -88,7 +88,7 @@ Repositório público: https://github.com/stoffelsautopecas/Stoffels
 
 As fotos WebP de produtos ficam no repositório público. Para respeitar os limites de upload da Vercel, `.vercelignore` as exclui do pacote enviado, e `STOFFELS_IMAGE_BASE_URL` aponta para a pasta pública do GitHub. O build usa essa base nas galerias. Logos, banners e arte da Stoffels continuam no site. Nenhuma senha é necessária para servir essas imagens.
 
-Variáveis do servidor: `DATABASE_URL`, `INFINITEPAY_HANDLE=stoffels`, `CHECKOUT_ENABLED=false` e `STOFFELS_IMAGE_BASE_URL`. Não publicar `DIRECT_URL` no frontend; ela serve apenas às migrações. Ao trocar a senha, atualizar `.env.local` e `DATABASE_URL` na hospedagem e fazer novo deploy. Frete grátis para todo o Brasil em todos os produtos, sem pedido mínimo (`config/checkout.json`). O checkout ainda aguarda implementação de geração e confirmação de pagamentos e confirmação dos estoques.
+Variáveis do servidor: `DATABASE_URL`, `INFINITEPAY_HANDLE=stoffels`, `CHECKOUT_ENABLED=false` e `STOFFELS_IMAGE_BASE_URL`. Não publicar `DIRECT_URL` no frontend; ela serve apenas às migrações. Ao trocar a senha, atualizar `.env.local` e `DATABASE_URL` na hospedagem e fazer novo deploy. Frete calculado por CEP pelo Melhor Envio, exclusivamente para consulta, sem compra de etiquetas (`config/checkout.json`). A consulta real exige `MELHOR_ENVIO_TOKEN` no servidor. O checkout ainda aguarda implementação de geração e confirmação de pagamentos e confirmação dos estoques.
 
 ### Site publicado
 
@@ -113,3 +113,7 @@ Autenticação própria, sem Supabase Auth: cadastro e login em `/minha-conta`, 
 Administrador: `acesso@stoffels.com`. Defina a senha localmente com `node --env-file=.env.local scripts/manage-user.mjs admin acesso@stoffels.com` (entrada oculta). Não existe senha padrão.
 
 As telas de acesso estão prontas; edição de peças, pedidos, endereços e finalização do checkout continuam como próximas etapas.
+
+## Frete e embalagens
+
+Consulte [a configuração do Melhor Envio e as estimativas de embalagem](docs/shipping.md). Os 7.963 produtos possuem estimativas identificadas como tal; não são medições reais.

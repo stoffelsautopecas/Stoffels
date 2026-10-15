@@ -10,10 +10,10 @@
   "createLinkUrl": "https://api.checkout.infinitepay.io/links",
   "paymentCheckUrl": "https://api.checkout.infinitepay.io/payment_check",
   "shipping": {
-    "method": "free",
-    "priceCents": 0,
-    "minimumOrderCents": 0,
-    "destination": "BR",
-    "label": "Frete grátis"
+    "method": "calculated",
+    "provider": "melhor_envio",
+    "quoteOnly": true,
+    "originPostalCode": "97950000",
+    "label": "Frete calculado pelo CEP"
   }
 }

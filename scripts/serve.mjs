@@ -10,6 +10,7 @@ import catalogHandler from '../api/catalog.js';
 import productHandler from '../api/product.js';
 import authHandler from '../api/auth.js';
 import adminHandler from '../api/admin.js';
+import shippingHandler from '../api/shipping.js';
 const envPath = fileURLToPath(new URL('../.env.local', import.meta.url));
 if (existsSync(envPath)) loadEnvFile(envPath);
 const compress = promisify(gzip);
@@ -18,6 +19,7 @@ const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charse
 const server = http.createServer(async (req, res) => {
   try {
     let name = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    if(name==='/api/shipping'){await shippingHandler(req,res);return;}
     if(name==='/api/auth'){await authHandler(req,res);return;}
     if(name==='/api/admin'){await adminHandler(req,res);return;}
     if(name==='/api/catalog'){await catalogHandler(req,res);return;}
