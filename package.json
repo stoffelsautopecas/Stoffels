@@ -2,7 +2,7 @@
   "name": "stoffels",
   "version": "1.0.0",
   "private": true,
-  "description": "Cat\u00e1logo e vitrine Stoffels Autope\u00e7as",
+  "description": "Catálogo e vitrine Stoffels Autopeças",
   "scripts": {
     "dev": "node scripts/serve.mjs",
     "build": "node scripts/build.mjs",
@@ -10,7 +10,8 @@
     "verify": "node scripts/verify.mjs",
     "import:catalog": "python3 scripts/import_catalog.py",
     "db:migrate": "node --env-file=.env.local scripts/db-migrate.mjs",
-    "db:seed": "node --env-file=.env.local scripts/db-seed.mjs"
+    "db:seed": "node --env-file=.env.local scripts/db-seed.mjs",
+    "test:auth": "node --env-file=.env.local scripts/test-auth.mjs && node scripts/test-auth-ui.mjs"
   },
   "engines": {
     "node": "22.x"

@@ -105,3 +105,11 @@ npx vercel deploy --prod --yes --archive=tgz
 ```
 
 O pacote `.deploy/` é ignorado pelo Git, contém o código e o catálogo necessários ao site e exclui `.env.local`, caches, Git e as fotos de produtos. As variáveis protegidas já foram cadastradas na Vercel. A publicação foi conferida por HTTP, incluindo as consultas reais do ORM ao Supabase; não houve inspeção visual por navegador conectado nesta sessão.
+
+## Contas e autenticação
+
+Autenticação própria, sem Supabase Auth: cadastro e login em `/minha-conta`, acesso restrito em `/admin`, troca de senha e sessões HttpOnly armazenadas como hash no PostgreSQL. Veja [configuração e recuperação de acesso](docs/authentication.md).
+
+Administrador: `acesso@stoffels.com`. Defina a senha localmente com `node --env-file=.env.local scripts/manage-user.mjs admin acesso@stoffels.com` (entrada oculta). Não existe senha padrão.
+
+As telas de acesso estão prontas; edição de peças, pedidos, endereços e finalização do checkout continuam como próximas etapas.

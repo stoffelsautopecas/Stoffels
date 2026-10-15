@@ -59,7 +59,7 @@ function categoryPage() {
 }
 function syncLayout(slug) {
   document.body.classList.toggle('has-purchase-bar',Boolean($('#main [data-add]')));
-  const active = !slug ? 'home' : slug==='categorias' ? 'categories' : slug==='catalogo' ? 'search' : 'categories';
+  const active = ['minha-conta','admin'].includes(slug) ? 'account' : !slug ? 'home' : slug==='categorias' ? 'categories' : slug==='catalogo' ? 'search' : 'categories';
   document.querySelectorAll('[data-mobile-tab]').forEach(el=>{
     el.classList.toggle('active',el.dataset.mobileTab===active);
     if(el.dataset.mobileTab===active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
@@ -78,6 +78,7 @@ async function renderRoute() {
   document.body.classList.remove('has-purchase-bar');
   $('meta[name="description"]').content = 'Encontre peças automotivas originais e seminovas na Stoffels. Motores, lataria, faróis, câmbios e acessórios.';
   $('#search input').value = new URLSearchParams(location.search).get('q') || '';
+  if (slug==='minha-conta'||slug==='admin') {await accountPage(slug,sequence);document.title=(slug==='admin'?'Administração':'Minha conta')+' | Stoffels';syncLayout(slug);return;}
   if (p) {
     $('#main').innerHTML = '<div class="container loading">Carregando detalhes da peça…</div>';
     try {
@@ -105,7 +106,6 @@ function cartContent() {
   $('#cart-content').innerHTML = entries.length ? `${entries.map(({p,quantity})=>`<div class="cart-item"><img src="${esc(imageUrl(p.image||placeholder))}" alt="${esc(p.name)}" width="80" height="80"><div><a href="${esc(productUrl(p))}" data-close-cart>${esc(p.name)}</a><strong>${money(p.price)}</strong><div class="cart-controls"><button data-quantity="${p.id}" data-delta="-1" aria-label="Diminuir quantidade">−</button><span>${quantity}</span><button data-quantity="${p.id}" data-delta="1" aria-label="Aumentar quantidade">+</button><button data-remove="${p.id}" class="remove">Remover</button></div>${!p.available?'<small>Produto indisponível</small>':''}</div></div>`).join('')}<div class="cart-total"><span>Subtotal</span><strong>${money(total)}</strong></div><div class="cart-total"><span>Frete</span><strong class="free-shipping">Grátis</strong></div><div class="cart-total"><span>Total</span><strong>${money(total)}</strong></div><p class="checkout-note">Checkout em configuração. Nenhum pedido ou pagamento será realizado neste momento.</p><button class="primary-button" id="continue-shopping">Continuar comprando</button>`:'<div class="empty"><h3>Seu carrinho está vazio</h3><p>Encontre a peça que seu carro precisa.</p><button class="primary-button" id="continue-shopping">Ver catálogo</button></div>';
 }
 const dialogs = {
-  account:['Minha conta','O acesso à conta de clientes será disponibilizado junto com a configuração do checkout.'],
   support:['Fale com a Stoffels','Os canais de atendimento da Stoffels serão informados em breve.'],
   warranty:['Garantia das peças','As peças do catálogo de origem têm garantia de 90 dias. Confira o estado, o código e a aplicação da peça antes da compra. As condições de atendimento da Stoffels serão informadas antes da abertura das vendas.'],
   shipping:['Envio e entrega','Todos os produtos têm frete grátis para todo o Brasil, sem valor mínimo de compra. O prazo de entrega será informado pela loja conforme o destino.'],
@@ -116,6 +116,7 @@ document.addEventListener('click', event => {
   if (anchor && anchor.origin === location.origin && !anchor.hash && !event.ctrlKey && !event.metaKey && !event.shiftKey && event.button===0) { event.preventDefault(); if (anchor.hasAttribute('data-close-cart')) $('#cart-dialog').close(); go(anchor.pathname+anchor.search); return; }
   const target = event.target.closest('button');
   if (!target) return;
+  if (target.dataset.dialog==='account') {go('/minha-conta');return;}
   if (target.dataset.dialog) { const [title,text]=dialogs[target.dataset.dialog]; $('#dialog-content').innerHTML=`<h2>${title}</h2><p>${text}</p>`; $('#info-dialog').showModal(); }
   if (target.id==='dialog-close') $('#info-dialog').close();
   if (target.id==='category-toggle') { $('#category-menu').hidden=!$('#category-menu').hidden; target.setAttribute('aria-expanded',String(!$('#category-menu').hidden)); }
@@ -163,6 +164,43 @@ window.addEventListener('popstate',renderRoute);
 window.matchMedia?.('(min-width: 960px)').addEventListener('change',()=>{const filters=$('details.filters');if(filters)filters.open=window.matchMedia('(min-width: 960px)').matches;});
 $('#year').textContent = new Date().getFullYear();
 $('#primary-nav').innerHTML=nav.map(([name,slug],i)=>`<a href="/${slug}" class="${i===0?'promotion':''}">${name}<span>⌄</span></a>`).join('');
+async function accountApi(action,data={}) {
+  const response=await fetch('/api/auth',action?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...data})}:{});
+  const result=await response.json();if(!response.ok)throw new Error(result.error||'Não foi possível acessar sua conta.');return result;
+}
+function loginForm(admin=false) {
+  const register=!admin&&new URLSearchParams(location.search).get('cadastro')==='1';
+  return `<section class="container account-page"><div class="account-card"><span class="eyebrow">${admin?'ADMINISTRAÇÃO':'MINHA CONTA'}</span><h1>${register?'Criar minha conta':admin?'Entrar no painel':'Entrar na minha conta'}</h1><p>${admin?'Acesso exclusivo da equipe Stoffels.':'Acesse sua conta na Stoffels.'}</p><form id="account-form" data-action="${register?'register':'login'}">${register?'<label>Nome completo<input name="name" autocomplete="name" minlength="2" maxlength="100" required></label>':''}<label>E-mail<input name="email" type="email" autocomplete="username" maxlength="254" required></label><label>Senha<input name="password" type="password" autocomplete="${register?'new-password':'current-password'}" ${register?'minlength="12"':''} maxlength="256" required></label>${register?'<small>Use pelo menos 12 caracteres.</small>':''}<p class="form-message" role="status" aria-live="polite"></p><button class="primary-button" type="submit">${register?'Criar conta':'Entrar'}</button></form>${admin?'<a href="/minha-conta">Acesso do cliente →</a>':`<a href="/minha-conta${register?'':'?cadastro=1'}">${register?'Já tenho uma conta':'Quero criar minha conta'} →</a>`}<p class="account-help">Se precisar recuperar o acesso, entre em contato com a loja.</p></div></section>`;
+}
+async function accountPage(slug,sequence) {
+  const admin=slug==='admin';
+  $('#main').innerHTML='<section class="container loading">Verificando seu acesso…</section>';
+  try {
+    const {user}=await accountApi();if(sequence!==routeSequence)return;
+    if(!user){$('#main').innerHTML=loginForm(admin);return;}
+    if(admin){
+      if(user.role!=='admin'){$('#main').innerHTML='<section class="container account-page"><div class="account-card"><h1>Acesso restrito</h1><p>Esta conta não tem permissão para acessar a administração.</p><a href="/minha-conta">Voltar à minha conta</a><button class="primary-button" data-logout>Sair da conta</button></div></section>';return;}
+      const response=await fetch('/api/admin');const result=await response.json();if(!response.ok)throw new Error(result.error);if(sequence!==routeSequence)return;
+      $('#main').innerHTML=`<section class="container account-page"><div class="account-card"><span class="eyebrow">ADMINISTRAÇÃO STOFFELS</span><h1>Olá, ${esc(user.name)}</h1><p>Seu acesso administrativo está ativo.</p><div class="account-stats"><p><strong>${result.summary.products}</strong>Peças</p><p><strong>${result.summary.customers}</strong>Clientes</p><p><strong>${result.summary.orders}</strong>Pedidos</p></div><p>O gerenciamento de peças e pedidos será disponibilizado na próxima etapa.</p><a href="/minha-conta">Minha conta e segurança →</a><button class="primary-button" data-logout>Sair da conta</button><p class="form-message" role="status"></p></div></section>`;return;
+    }
+    $('#main').innerHTML=`<section class="container account-page"><div class="account-card"><span class="eyebrow">MINHA CONTA</span><h1>Olá, ${esc(user.name)}</h1><p>${esc(user.email)}</p>${user.role==='admin'?'<a href="/admin">Abrir administração →</a>':''}<h2>Segurança da conta</h2><form id="account-form" data-action="password"><label>Senha atual<input name="currentPassword" type="password" autocomplete="current-password" required maxlength="256"></label><label>Nova senha<input name="password" type="password" autocomplete="new-password" minlength="12" maxlength="256" required></label><small>Use pelo menos 12 caracteres. A troca encerra os outros acessos à conta.</small><p class="form-message" role="status" aria-live="polite"></p><button class="primary-button" type="submit">Alterar senha</button></form><button class="account-logout" data-logout>Sair da conta</button><p class="form-message" role="status"></p></div></section>`;
+  }catch(error){if(sequence===routeSequence)$('#main').innerHTML=`<section class="container account-page"><div class="account-card"><h1>Acesso indisponível</h1><p role="alert">${esc(error.message)}</p><a href="/${admin?'admin':'minha-conta'}">Tentar novamente →</a></div></section>`;}
+}
+document.addEventListener('submit',async event=>{
+ if(event.target.id!=='account-form')return;
+ event.preventDefault();const form=event.target,button=form.querySelector('[type="submit"]'),message=form.querySelector('.form-message');
+ button.disabled=true;message.textContent='Aguarde…';
+ try{
+  const result=await accountApi(form.dataset.action,Object.fromEntries(new FormData(form)));
+  if(form.dataset.action==='password'){form.reset();message.textContent=result.message;}else await renderRoute();
+ }catch(error){message.textContent=error.message;}finally{button.disabled=false;}
+});
+document.addEventListener('click',async event=>{
+ const button=event.target.closest('[data-logout]');if(!button)return;button.disabled=true;
+ try{await accountApi('logout');go(location.pathname==='/admin'?'/admin':'/minha-conta');}
+ catch(error){const message=$('#main .form-message');if(message)message.textContent=error.message;}finally{button.disabled=false;}
+});
+
 async function boot(){
   try {
     let imported;
@@ -179,6 +217,6 @@ async function boot(){
     bySlug=new Map(products.map(p=>[p.slug,p]));byId=new Map(products.map(p=>[p.id,p]));
     $('#category-menu').innerHTML='<b>Linhas de peças</b>'+categories.filter(c=>!c.slug.includes('/')).sort((a,b)=>a.name.localeCompare(b.name)).map(c=>`<a href="/${esc(c.slug)}">${esc(names[c.slug]||c.name)} <span>›</span></a>`).join('')+'<a class="all-catalog" href="/catalogo">Ver todo o catálogo →</a>';
     cart=cart.filter(x=>byId.has(x.id));saveCart();await renderRoute();
-  } catch { $('#main').innerHTML='<section class="container empty"><h1>O catálogo não carregou</h1><p>Verifique sua conexão e atualize a página.</p></section>'; }
+  } catch { if(['/minha-conta','/admin'].includes(location.pathname)){await renderRoute();return;} $('#main').innerHTML='<section class="container empty"><h1>O catálogo não carregou</h1><p>Verifique sua conexão e atualize a página.</p></section>'; }
 }
 boot();
