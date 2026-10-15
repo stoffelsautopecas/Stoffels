@@ -51,6 +51,11 @@ try{
  await verifyOrderPayment({orderId:uncertain.id,transactionNsu:'test-late',slug:'test-late',gateway},pool);assert.equal((await query('select status from stoffels.orders where id=$1',[uncertain.id])).rows[0].status,'paid');
  const tooMany=[{id:saved.id,quantity:2}];await assert.rejects(async()=>createCheckout({user,body:{...base,items:tooMany,clientKey:randomUUID(),quoteId:await quote(tooMany)},gateway},pool),/quantidade solicitada/);
  const expiredQuote=await quote();await query("update stoffels.shipping_quotes set expires_at=now()-interval '1 second' where id=$1",[expiredQuote]);await assert.rejects(()=>createCheckout({user,body:{...base,clientKey:randomUUID(),quoteId:expiredQuote},gateway},pool),/cotação expirou/);
+ const freeQuote=await quote();await query('update stoffels.shipping_quotes set options=$1 where id=$2',[JSON.stringify([{serviceId:'free-no-quote',carrier:'Stoffels',name:'Frete grátis',priceCents:0,deliveryDays:null,freeFallback:true}]),freeQuote]);
+ let freePayload;
+ const freeOrder=await createCheckout({user,body:{...base,clientKey:randomUUID(),quoteId:freeQuote,serviceId:'free-no-quote',shippingCents:999999},gateway:{createLink:async p=>{freePayload=p;return {url:'https://checkout.infinitepay.io/test-free',slug:'test-free'};}}},pool);
+ assert.equal(freePayload.items.length,1);assert.equal(freePayload.items[0].price,19900);
+ const freeRow=(await query('select shipping_cents,total_cents from stoffels.orders where id=$1',[freeOrder.id])).rows[0];assert.equal(Number(freeRow.shipping_cents),0);assert.equal(Number(freeRow.total_cents),19900);
  await adminPost({action:'archive',id:saved.id},user,pool);assert.equal((await query('select archived from stoffels.products where id=$1',[saved.id])).rows[0].archived,true);
  await assert.rejects(()=>saveProduct({...input,images:['javascript:alert(1)']},pool));
  console.log('Comércio: cadastro/edição de produto, preço e frete no servidor, reserva de estoque, idempotência, falhas do provedor, pagamentos duplicados/tardios, rastreio, mensagens e arquivamento verificados em transação revertida. Nenhuma chamada real ou cobrança.');

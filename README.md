@@ -71,7 +71,7 @@ Novas fotos são enviadas pelo painel, reprocessadas para WebP com até 1600px e
 
 ## Pagamento, entrega e operação
 
-Consulte [InfinitePay](docs/checkout-infinitepay.md) e [frete](docs/shipping.md). O Melhor Envio é usado só para consulta. Etiquetas, postagem, emissão fiscal e estornos são operados pela loja nos respectivos serviços; o site não paga etiquetas nem realiza estornos automaticamente.
+Consulte [InfinitePay](docs/checkout-infinitepay.md) e [frete](docs/shipping.md). O Melhor Envio é usado só para consulta. Quando uma resposta válida não traz opções de frete, aplica-se frete grátis por política da loja; a Stoffels organiza e custeia o transporte. Falhas de conexão/autenticação não acionam essa regra. Etiquetas, postagem, emissão fiscal e estornos são operados pela loja nos respectivos serviços; o site não paga etiquetas nem realiza estornos automaticamente.
 
 O pedido reserva estoque antes da geração do link. Um link ativo não tem sua reserva liberada só por passar tempo: a API pública consultada não documenta cancelamento/expiração de links. Falhas ambíguas ficam em conferência para evitar duplicar cobranças. Veja o procedimento de recuperação e cancelamento no documento do checkout.
 

@@ -14,6 +14,7 @@
     "provider": "melhor_envio",
     "quoteOnly": true,
     "originPostalCode": "97950000",
-    "label": "Frete calculado pelo CEP"
+    "label": "Frete calculado pelo CEP",
+    "freeWhenNoQuote": true
   }
 }

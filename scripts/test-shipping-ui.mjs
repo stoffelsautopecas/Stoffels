@@ -8,11 +8,11 @@ dom.window.scrollTo=()=>{};
 dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
 dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
 dom.window.localStorage.setItem('stoffels-cart-v1',JSON.stringify([{id:product.id,quantity:1}]));
-let requestBody,fail=false;
+let requestBody,fail=false,free=false;
 dom.window.fetch=async(url,options)=>{
  if(url==='/api/shipping'){
   requestBody=JSON.parse(options.body);
-  return {ok:!fail,json:async()=>fail?{error:'Sem serviço disponível'}:{quoteId:'test-quote',expiresAt:new Date(Date.now()+60000).toISOString(),estimated:true,options:[{serviceId:'1',carrier:'Transportadora',name:'Entrega',priceCents:2590,deliveryDays:5}]}};
+  return {ok:!fail,json:async()=>fail?{error:'Sem serviço disponível'}:{quoteId:'test-quote',expiresAt:new Date(Date.now()+60000).toISOString(),estimated:true,options:free?[{serviceId:'free-no-quote',carrier:'Stoffels',name:'Frete grátis',priceCents:0,deliveryDays:null,freeFallback:true}]:[{serviceId:'1',carrier:'Transportadora',name:'Entrega',priceCents:2590,deliveryDays:5}]}};
  }
  if(String(url).includes('catalog.json'))return {ok:true,json:async()=>[product]};
  if(String(url).includes('categories.json'))return {ok:true,json:async()=>[]};
@@ -30,5 +30,10 @@ const money=n=>Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'
 assert.equal(doc.querySelector('#cart-content .cart-total:last-of-type strong')?.textContent||doc.querySelectorAll('#cart-content .cart-total strong')[2].textContent,money(product.price+25.9));
 assert.match(doc.querySelector('#cart-content').textContent,/embalagem estimados/);
 doc.querySelector('[data-delta="1"]').click();assert.equal(doc.querySelector('[name="shipping-service"]'),null);assert.match(doc.querySelector('#cart-content').textContent,/A calcular/);
+free=true;submit();await waitFor(()=>doc.querySelector('[name="shipping-service"]:checked'));
+assert.equal(doc.querySelectorAll('#cart-content .cart-total strong')[1].textContent,'Grátis');
+assert.equal(doc.querySelectorAll('#cart-content .cart-total strong')[2].textContent,money(product.price*2));
+assert.match(doc.querySelector('#cart-content').textContent,/Transporte e prazo combinados com a Stoffels/);
+assert.doesNotMatch(doc.querySelector('#cart-content').textContent,/null dia|undefined dia/);
 fail=true;submit();await waitFor(()=>doc.querySelector('#shipping-message')?.textContent==='Sem serviço disponível');assert.equal(doc.querySelector('[name="shipping-service"]'),null);
 dom.window.close();console.log('Interface de frete: CEP, consulta, seleção, total, mudança do carrinho e indisponibilidade verificados.');

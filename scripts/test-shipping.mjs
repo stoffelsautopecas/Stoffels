@@ -20,7 +20,13 @@ const calls=[];const options=await calculateShipping({token:'fake',from:'9795000
 assert.equal(calls.length,1);assert.equal(new URL(calls[0].url).pathname,'/api/v2/me/shipment/calculate');assert.equal(calls[0].init.redirect,'error');assert.equal(JSON.parse(calls[0].init.body).products[0].insurance_value,199);assert.equal(options[0].priceCents,2590);assert.equal(options[0].deliveryDays,7);
 assert.deepEqual(quoteOptions([{id:1,price:null,delivery_time:1},{id:2,price:'-1',delivery_time:1}]),[]);
 await assert.rejects(()=>calculateShipping({from:'97950000',to:'01001000',products}));
-await assert.rejects(()=>calculateShipping({token:'fake',from:'97950000',to:'01001000',products},async()=>({ok:true,json:async()=>[]})));
+const free=await calculateShipping({token:'fake',from:'97950000',to:'01001000',products},async()=>({ok:true,json:async()=>[]}));
+assert.equal(free.length,1);assert.equal(free[0].priceCents,0);assert.equal(free[0].freeFallback,true);assert.equal(free[0].deliveryDays,null);
+const declined=await calculateShipping({token:'fake',from:'97950000',to:'01001000',products},async()=>({ok:true,json:async()=>[{id:1,error:'Peso excedido'},{id:2,error:'Valor excedido'}]}));assert.equal(declined[0].serviceId,'free-no-quote');
+await assert.rejects(()=>calculateShipping({token:'fake',from:'97950000',to:'01001000',products},async()=>({ok:false,status:500})));
+await assert.rejects(()=>calculateShipping({token:'fake',from:'97950000',to:'01001000',products},async()=>({ok:false,status:401})));
+await assert.rejects(()=>calculateShipping({token:'fake',from:'97950000',to:'01001000',products},async()=>{throw new Error('timeout');}));
+await assert.rejects(()=>calculateShipping({token:'fake',from:'97950000',to:'01001000',products},async()=>({ok:true,json:async()=>({error:'Formato inesperado'})})));
 const validClient={query:async(sql,args)=>{assert.equal(args[1],shippingFingerprint(cart,records));return {rows:[{options}]};}};
 assert.equal((await selectedShipping({quoteId:'12345678-1234-1234-1234-123456789abc',serviceId:1,cart,records,cep:'01001000'},validClient)).priceCents,2590);
 await assert.rejects(()=>selectedShipping({quoteId:'12345678-1234-1234-1234-123456789abc',serviceId:2,cart,records,cep:'01001000'},validClient));

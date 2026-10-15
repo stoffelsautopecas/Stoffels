@@ -39,7 +39,7 @@ O relatório completo fica em `reports/shipping-estimates.json` (ignorado pelo G
 
 ## Carrinho e checkout
 
-O cliente informa o CEP e escolhe uma opção. Os valores retornados em `custom_price`/`custom_delivery_time` têm preferência sobre os campos base. Serviços com erro são removidos; quando não há serviço disponível, mostrar indisponibilidade e não inventar uma taxa.
+O cliente informa o CEP e escolhe uma opção. Os valores retornados em `custom_price`/`custom_delivery_time` têm preferência sobre os campos base. Serviços com erro são removidos. Por autorização do proprietário, se uma resposta válida do Melhor Envio não trouxer nenhuma opção utilizável, a loja oferece frete grátis: opção `free-no-quote`, valor zero e transporte organizado pela Stoffels. O prazo fica a combinar, sem prazo fictício. Falhas de autenticação, conexão, HTTP ou formato inválido continuam sendo erros e não geram frete grátis.
 
 As cotações ficam no banco por 15 minutos, vinculadas ao CEP e ao conteúdo do carrinho, preços e medidas. O total da tela soma produtos + frete escolhido. Trocar produtos/quantidades ou vencer a cotação invalida a escolha. Não enviar valores do navegador diretamente para cobranças: o checkout precisa usar `selectedShipping` do servidor e voltar a conferir os preços e o estoque.
 
