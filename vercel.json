@@ -3,6 +3,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/compra/geovanna",
+      "destination": "/assets/compra-geovanna.html"
+    },
+    {
       "source": "/((?!api/|data/|images/|assets/|favicon.svg|manifest.webmanifest).*)",
       "destination": "/index.html"
     }
