@@ -18,7 +18,7 @@ function makeDOM(path){
   if(path.startsWith('/admin')&&String(url).startsWith('/api/catalog'))throw new Error('Admin não deve carregar catálogo completo');
   const parsed=new URL(url,'http://localhost:3001'),body=options.body&&JSON.parse(options.body);if(body)requests.push({path:parsed.pathname,body});let data;
   if(parsed.pathname==='/api/store')data={settings:{name:'Stoffels',cnpj:'04.966.153/0001-49',phone:'55996712043',address:'Loja'}};
-  else if(parsed.pathname==='/api/auth')data={user};
+  else if(parsed.pathname==='/api/auth'){if(path.startsWith('/admin'))throw new Error('Admin não deve duplicar consulta de autenticação');data={user};}
   else if(parsed.pathname==='/api/customer'){data={user:{...user,phone:'55996712043'},addresses:[]};}
   else if(parsed.pathname==='/api/orders'){if(body?.action==='verify')data={paid:order.status==='paid'};else data=parsed.searchParams.has('id')?{order}:{orders:[{...order,totalCents:order.totalCents}]};}
   else if(parsed.pathname==='/api/checkout'){data={id:order.id,url:null,status:'pending'};}
@@ -33,6 +33,7 @@ function makeDOM(path){
    else if(view==='settings')data={settings:{name:'Stoffels',phone:'55996712043',cnpj:'04.966.153/0001-49',address:'Loja',dispatchDays:0}};
    else if(view==='customers')data={customers:[]};
    else data={summary:{products:7963,customers:1,orders:1,to_ship:1,revenue_cents:22400,attention:0,unknown_stock:0}};
+   data.user=user;
   }else if(parsed.pathname==='/api/catalog'||parsed.pathname==='/data/catalog.json')data=parsed.pathname.startsWith('/api/')?{products:[p],categories:[{slug:p.category,name:'Categoria',count:1}]}:[p];
   else if(parsed.pathname==='/data/categories.json')data=[{slug:p.category,name:'Categoria',count:1}];
   else return {ok:false,json:async()=>({error:'Não encontrado'})};
@@ -44,6 +45,8 @@ const admin=makeDOM('/admin');const doc=admin.window.document;
 await waitFor(()=>doc.querySelector('.stats-grid'));
 doc.querySelector('a[href="/admin?tab=products&new=1"]').click();await waitFor(()=>doc.querySelector('#admin-product-form'));
 let form=doc.querySelector('#admin-product-form');
+// Chromium expõe o controle name=id como form.id; o roteador deve ler o atributo.
+Object.defineProperty(form,'id',{value:form.elements.namedItem('id'),configurable:true});
 for(const [name,value]of Object.entries({name:'Peça nova',brand:'Marca',model:'Modelo',price:'199.00',originalPrice:'199.00',stockQuantity:'10',description:'Texto',images:'/images/brand/logo.png',weightKg:'0.6',lengthCm:'30',widthCm:'20',heightCm:'15'}))form.elements[name].value=value;
 form.dispatchEvent(new admin.window.Event('submit',{bubbles:true,cancelable:true}));await waitFor(()=>savedProduct&&doc.querySelector('input[name=id]')?.value==='12345');assert.equal(savedProduct.stockQuantity,10);assert.equal(savedProduct.priceCents,19900);
 doc.querySelector('.management-tabs a[href="/admin?tab=orders"]').click();await waitFor(()=>doc.querySelector('.order-card'));
