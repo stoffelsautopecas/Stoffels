@@ -39,11 +39,11 @@ dom.window.fetch=async url=>{
 dom.window.eval(js);
 const waitFor=async condition=>{for(let i=0;i<100;i++){if(condition())return;await new Promise(resolve=>setTimeout(resolve,10));}throw new Error('Estado esperado não encontrado');};
 const doc=dom.window.document;
-await waitFor(()=>doc.querySelector('.hero'));
-assert.equal(doc.querySelector('.home-banner img').getAttribute('src'),'/images/brand/banner.png','O banner fornecido deve aparecer na home');
+await waitFor(()=>doc.querySelector('.showcase .product-card'));
+assert.equal(doc.querySelector('.home-banner img').getAttribute('src'),'/images/brand/banner-optimized.webp','O banner fornecido deve aparecer na home');
 assert.equal(doc.querySelectorAll('.showcase .product-card').length,16,'Vitrines devem ter produtos disponíveis');
 for (const img of doc.querySelectorAll('img')) if(img.getAttribute('src')?.startsWith('/')) await access(path.join(publicDir,new URL(img.src).pathname));
-assert.equal(doc.querySelector('header .brand-logo').getAttribute('src').split('?')[0],'/images/brand/logo.png','Logo deve carregar o PNG diretamente');
+assert.equal(doc.querySelector('header .brand-logo').getAttribute('src').split('?')[0],'/images/brand/logo-optimized.webp','Logo deve carregar a imagem otimizada');
 assert.equal(doc.querySelectorAll('.mobile-nav [data-mobile-tab]').length,5);
 doc.querySelector('.mobile-nav a[href="/categorias"]').click();
 assert.ok(doc.querySelector('.category-directory'));

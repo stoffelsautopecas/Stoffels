@@ -20,7 +20,7 @@ dom.window.fetch=async(url,options)=>{
 };
 const waitFor=async fn=>{for(let i=0;i<100;i++){if(fn())return;await new Promise(r=>setTimeout(r,10));}throw new Error('Estado esperado não encontrado');};
 dom.window.eval(await load('assets/app.js'));const doc=dom.window.document;
-await waitFor(()=>doc.querySelector('.hero'));
+await waitFor(()=>doc.querySelector('.showcase .product-card'));
 doc.querySelector('#cart-toggle').click();assert.match(doc.querySelector('#cart-content').textContent,/A calcular/);assert.doesNotMatch(doc.querySelector('#cart-content').textContent,/Grátis/);
 const submit=()=>{doc.querySelector('#shipping-cep').value='01001-000';doc.querySelector('#shipping-form').dispatchEvent(new dom.window.Event('submit',{bubbles:true,cancelable:true}));};
 submit();await waitFor(()=>doc.querySelector('[name="shipping-service"]'));

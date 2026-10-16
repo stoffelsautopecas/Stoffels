@@ -12,8 +12,10 @@ const requests=[];
 function makeDOM(path){
  const dom=new JSDOM(html,{url:'http://localhost:3001'+path,runScripts:'outside-only',pretendToBeVisual:true});dom.window.scrollTo=()=>{};dom.window.confirm=()=>true;Object.defineProperty(dom.window.crypto,'randomUUID',{value:randomUUID});
  dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};dom.window.HTMLDialogElement.prototype.close=function(){this.open=false;};
+ if(path.startsWith('/admin'))dom.window.STOFFELS_CONFIG={databaseApi:true};
  dom.window.localStorage.setItem('stoffels-cart-v1',JSON.stringify([{id:p.id,quantity:1}]));
  dom.window.fetch=async(url,options={})=>{
+  if(path.startsWith('/admin')&&String(url).startsWith('/api/catalog'))throw new Error('Admin não deve carregar catálogo completo');
   const parsed=new URL(url,'http://localhost:3001'),body=options.body&&JSON.parse(options.body);if(body)requests.push({path:parsed.pathname,body});let data;
   if(parsed.pathname==='/api/store')data={settings:{name:'Stoffels',cnpj:'04.966.153/0001-49',phone:'55996712043',address:'Loja'}};
   else if(parsed.pathname==='/api/auth')data={user};
@@ -23,7 +25,8 @@ function makeDOM(path){
   else if(parsed.pathname==='/api/shipping')data={quoteId:randomUUID(),expiresAt:new Date(Date.now()+60000).toISOString(),estimated:true,options:[{serviceId:'1',carrier:'Transportadora',name:'Entrega',priceCents:2500,deliveryDays:5}]};
   else if(parsed.pathname==='/api/admin'){
    const view=parsed.searchParams.get('view');
-   if(body?.action==='product'){savedProduct={...body.product,id:12345,catalog:{...p,featured:false},details:{images:body.product.images,description:'Descrição salva'}};data={id:12345};}
+   if(view==='categories')data={categories:[{slug:p.category,name:'Categoria',count:1}]};
+   else if(body?.action==='product'){savedProduct={...body.product,id:12345,catalog:{...p,featured:false},details:{images:body.product.images,description:'Descrição salva'}};data={id:12345};}
    else if(body?.action==='order'){order.fulfillmentStatus=body.fulfillmentStatus;order.trackingCode=body.trackingCode;data={ok:true};}
    else if(view==='products')data=parsed.searchParams.has('id')?{product:savedProduct}:{products:[],total:0,page:1};
    else if(view==='orders')data=parsed.searchParams.has('id')?{order}:{orders:[order]};
