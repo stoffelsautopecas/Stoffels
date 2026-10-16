@@ -6,6 +6,7 @@ import { gzip } from 'node:zlib';
 import { promisify } from 'node:util';
 import { existsSync } from 'node:fs';
 import { loadEnvFile } from 'node:process';
+import cepHandler from '../api/cep.js';
 import catalogHandler from '../api/catalog.js';
 import productHandler from '../api/product.js';
 import authHandler from '../api/auth.js';
@@ -25,6 +26,7 @@ const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charse
 const server = http.createServer(async (req, res) => {
   try {
     let name = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+    if(name==='/api/cep'){await cepHandler(req,res);return;}
     if(name==='/api/customer'){await customerHandler(req,res);return;}
     if(name==='/api/checkout'){await checkoutHandler(req,res);return;}
     if(name==='/api/orders'){await ordersHandler(req,res);return;}
