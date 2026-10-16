@@ -5,7 +5,7 @@ import { estimateShipping } from '../lib/shipping-estimates.js';
 const apply=process.argv.includes('--apply');
 try{
  const {rows}=await authPool().query('select id,name,category_slug as category,shipping from stoffels.products order by id');
- const report=rows.map(p=>({id:p.id,name:p.name,category:p.category,...(p.shipping&&!p.shipping.estimated?p.shipping:estimateShipping(p))}));
+ const report=rows.map(p=>({id:p.id,name:p.name,category:p.category,...(p.shipping&&!p.shipping.estimated?p.shipping:{...estimateShipping(p),freeShipping:p.shipping?.freeShipping===true})}));
  await mkdir('reports',{recursive:true});
  await writeFile('reports/shipping-estimates.json',JSON.stringify(report,null,2)+'\n');
  if(apply){
